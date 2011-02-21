@@ -2,8 +2,6 @@
 .DS_Store
 .project
 .svn
-build
-dist
 frames
 *.pyc
 *.proof
@@ -12,3 +10,5 @@ defaults/user.config
 personal/
 data/my/png
 data/my/results
+*.log
+data/my/data/*.xml
