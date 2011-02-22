@@ -4,7 +4,7 @@ generate() {
 	state=("\\" "|" "/" "-")
 	i=0
 	
-	echo -e "<?xml version="1.0"?>\n<file_events>" > $logfile
+	echo -e "<?xml version=\"1.0\"?>\n<file_events>" > $logfile
 	echo "generating ..."
 	
 	while read s
@@ -19,7 +19,7 @@ generate() {
 				;;
 			['+''-'])
 				ext="D"
-				if [[ "$t1" == '+' ]]; then
+				if [[ "${s:0:1}" == '+' ]]; then
 					ext="A"
 				fi
 				
