@@ -1,0 +1,91 @@
+#!/bin/sh
+
+generate() {
+	state=("\\" "|" "/" "-")
+	i=0
+	
+	echo -e "<?xml version="1.0"?>\n<file_events>" > $logfile
+	echo "generating ..."
+	
+	while read s
+	do
+		case ${s:0:1} in
+			[012345789])
+				datec=`echo $s | cut -f1 -d ':'`
+				user=`echo $s | cut -f2 -d ':'`				
+				;;
+			'&')
+				filename=`echo $s | cut -f2 -d '&'`
+				;;
+			['+''-'])
+				ext="D"
+				if [[ "$t1" == '+' ]]; then
+					ext="A"
+				fi
+				
+				str=`echo $s | sed -e "s/^[+-]//"`
+				
+				case $1 in
+					"crypt")
+						str=`C:/Perl/bin/perl.exe -e 'print crypt($ARGV[0], $ARGV[1])' "$str" "longcode0123"`
+						;;
+					"ch_code")	
+						rest=""
+						for ((j = 0; j < ${#str}; j++)); do 
+							rest=$rest`printf '%x' "'$(expr substr "$str" $j 1)'";`
+							echo -ne "\b${state[$i]}"
+							(( i += 1 ))
+							[[ $i -eq 5 ]] && i=0
+						done
+						str=`echo $rest | sed -e "s/20/\/s/g"`
+						;;
+					*)
+						str=`echo $s | md5sum | cut -f1 -d ' '`
+						str=${str:0:8}'/'${str:8:16}'/'${str:16:30}'.'${str:30:32}
+						;;
+				esac
+				
+				echo -ne '<event date="'$datec'"  author="'$filename'"  filename="'$str'" action="'$ext'"  comment=""/>\n' >> $logfile
+				;;
+		esac
+		
+		echo -ne "\b${state[$i]}"
+		(( i += 1 ))
+		[[ $i -eq 5 ]] && i=0
+	done < $gitdiff
+	echo -ne "\bcompleted!"
+	echo "</file_events>" >> $logfile
+}
+
+prepare_git() {
+	git log -U0 --diff-filter=AMD --reverse --pretty="%at000:%cn" $1 | \
+		grep -v "^--- " | \
+		grep -v "^+++ " | \
+		grep -v "^index " | \
+		grep -v "^Binary " | \
+		grep -v "^@@ " | \
+		grep -v "^[+-][ 	]*$" | \
+		grep -v "^[+-]$" | \
+		grep -v "^[ 	]*$" | \
+		sed -e "s/diff .* b\//\&/g" \
+			-e "s/^+[ 	]\+/+/g" \
+			-e "s/^-[ 	]\+/-/g" \
+			-e "s/[ 	]+$//g" \
+			-e "s/\"//g" > $gitdiff
+}
+
+fileaction="$(date +%j%H%M%s)"
+
+[ -n "$1" ] && countcommit=$1 || echo -e "первым параметром передаетс€ лимит коммитов\ngit log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10"
+echo -n "Ѕудет использован лимит: "
+[ -n "$1" ] && echo $1' коммитов' || echo "все коммиты"
+
+typehash=md5
+[ -n "$2" ] && typehash=$2 || echo -e "вторым параметром передаетс€ тип функции дл€ генерации хеша строки\nдоступны следующие значени€:\n\t\tmd5 Ч по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 -10 crypt"
+echo "Ѕудет применена функци€: "$typehash
+
+gitdiff=$fileaction".temp"
+logfile=$fileaction"action.xml"
+
+prepare_git $countcommit
+generate $typehash

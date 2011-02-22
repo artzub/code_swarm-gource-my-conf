@@ -1,0 +1,75 @@
+#!/bin/sh
+uses(){
+	echo -e 'using\n$0 file_codeswarm.xml'
+}
+
+generatelog(){
+	echo "genereting... "
+	state=("\\" "|" "/" "—")
+	i=0
+	if [ -f "$1" ]; then
+		result=${1%.*}'.log'
+		grep -e "event " $1 | \
+		sed -e "s/^[ 	]*//;s/^<event //g;s|/>$||g" | \
+		awk '
+			$1 ~ /date/ { p1=$1; } 
+			$1 ~ /author/ { p2=$1; } 
+			$1 ~ /action/ { p3=$1;} 
+			$1 ~ /filename/ { p4=$1; } 
+			$1 ~ /comment/ { p5=$1; } 
+			
+			$2 ~ /date/ { p1=$2; } 
+			$2 ~ /author/ { p2=$2; } 
+			$2 ~ /action/ { p3=$2; } 
+			$2 ~ /filename/ { p4=$2; } 
+			$2 ~ /comment/ { p5=$2; } 
+			
+			$3 ~ /date/ { p1=$3; } 
+			$3 ~ /author/ { p2=$3; } 
+			$3 ~ /action/ { p3=$3; } 
+			$3 ~ /filename/ { p4=$3; } 
+			$3 ~ /comment/ { p5=$3; } 
+			
+			$4 ~ /date/ { p1=$4; } 
+			$4 ~ /author/ { p2=$4; } 
+			$4 ~ /action/ { p3=$4; } 
+			$4 ~ /filename/ { p4=$4; } 
+			$4 ~ /comment/ { p5=$4; } 		
+			
+			$5 ~ /date/ { p1=$5; } 
+			$5 ~ /author/ { p2=$5; } 
+			$5 ~ /action/ { p3=$5; } 
+			$5 ~ /filename/ { p4=$5; } 
+			$5 ~ /comment/ { p5=$5; }
+			
+			{ print p1"|"p2"|"p3"|"p4"|"p5; } ' | \
+		sed -e 's/[^=]*="\([^"]*\)"\(.\)\?/\1\2/g' > $result 
+		# echo -n > $result
+		# grep -e "event " $1 | \
+		# sed -e "s/^[ 	]*//;s/^<event //g;s|/>$||g" | \
+		# while read line
+		# do
+			## line=`echo $line | sed -e "s/^[ 	]*//"`
+			## if [[ ${line:1:5} == "event" ]]; then
+				## echo -n $line | sed -e 's/.*date="\([^"]\+\).*/\1|/' >> $result
+				## echo -n $line | sed -e 's/.*author="\([^"]\+\).*/\1|/' >> $result
+				## echo -n $line | sed -e 's/.*action="\([^"]\+\).*/\1|/' >> $result
+				## echo -n $line | sed -e 's/.*filename="\([^"]\+\).*/\1|/' >> $result
+				## echo $line | sed -e 's/.*comment="\([^"]*\).*/\1/' >> $result
+				## echo -ne "\b${state[$i]}"
+				## (( i += 1 ))
+				## [[ $i -eq 5 ]] && i=0
+			## fi
+			# eval $line;
+			# echo "$date|$author|$action|$filename|$comment" >> $result
+			## echo -ne "\b${state[$i]}"
+			## (( i += 1 ))
+			## [[ $i -eq 5 ]] && i=0
+		# done 
+		echo -ne "\bcompleted!"
+	else
+		echo -e "file log code_swarm not exsits!\n$1"
+	fi
+}
+
+[ -n "$1" ] && generatelog $1 || uses 

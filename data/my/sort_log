@@ -1,0 +1,2 @@
+#!/bin/sh
+sort -n -k 1 -t '|' $1 > gource.log
