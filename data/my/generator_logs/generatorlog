@@ -84,7 +84,7 @@ generate() {
 			system("echo -ne \"" st[ist++] "\" >&2")
 			if (ist > 16) ist=0
 		}
-	' $gitdiff 
+	' $gitdiff
 
 	echo -ne "\b\b\b\b\b\b\b\b\b\b\b\bcompleted!" >&2
 	echo "</file_events>"
@@ -112,13 +112,13 @@ prepare_git() {
 
 fileaction="$(date +%j%H%M%s)"
 
-[ -n "$1" ] && countcommit=$1 || echo -e "РїРµСЂРІС‹Рј РїР°СЂР°РјРµС‚СЂРѕРј РїРµСЂРµРґР°РµС‚СЃСЏ Р»РёРјРёС‚ РєРѕРјРјРёС‚РѕРІ\ngit log --help\nРїР°СЂР°РјРµС‚РµСЂ:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10" >&2
-echo -n "Р‘СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅ Р»РёРјРёС‚: " >&2
-[ -n "$1" ] && echo $1' РєРѕРјРјРёС‚РѕРІ' >&2 || echo "РІСЃРµ РєРѕРјРјРёС‚С‹" >&2
+[ -n "$1" ] && countcommit=$1 || echo -e "первым параметром передается лимит коммитов\ngit log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10" >&2
+echo -n "Будет использован лимит: " >&2
+[ -n "$1" ] && echo $1' коммитов' >&2 || echo "все коммиты" >&2
 
 typehash=md5
-[ -n "$2" ] && typehash=$2 || echo -e "РІС‚РѕСЂС‹Рј РїР°СЂР°РјРµС‚СЂРѕРј РїРµСЂРµРґР°РµС‚СЃСЏ С‚РёРї С„СѓРЅРєС†РёРё РґР»СЏ РіРµРЅРµСЂР°С†РёРё С…РµС€Р° СЃС‚СЂРѕРєРё\nРґРѕСЃС‚СѓРїРЅС‹ СЃР»РµРґСѓСЋС‰РёРµ Р·РЅР°С‡РµРЅРёСЏ:\n\t\tmd5 вЂ” РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ\n\t\tcrypt\n\t\tch_code\nusing: $0 -10 crypt" >&2
-echo "Р‘СѓРґРµС‚ РїСЂРёРјРµРЅРµРЅР° С„СѓРЅРєС†РёСЏ: "$typehash >&2
+[ -n "$2" ] && typehash=$2 || echo -e "вторым параметром передается тип функции для генерации хеша строки\nдоступны следующие значения:\n\t\tmd5 — по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 -10 crypt" >&2
+echo "Будет применена функция: "$typehash >&2
 
 gitdiff=$fileaction".temp"
 logfile=$fileaction"action.xml"
