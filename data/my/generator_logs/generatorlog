@@ -71,7 +71,7 @@ generate() {
 				gsub(/32|16/, "/sd", str)
 			}
 			else {
-				cmd="echo \"" $0 "\" | md5sum | cut -f1 -d \" \" | sed -e \"s@[32|16]@/sd@g\"" 
+				cmd="echo \"" $0 "\" | md5sum | cut -f1 -d \" \" | sed -e \"s@[32|16]@/sd@g;\" -e \"s/\\(..\\)\$/.\\1/\"" 
 				if ( typehash == 2 )
 					cmd="C:/Perl/bin/perl -e \"print crypt($ARGV[0], $ARGV[1])\" \"" $0 "\" \"1/5l58j/jk\"" 
 				cmd | getline str;
