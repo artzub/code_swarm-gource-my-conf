@@ -92,32 +92,31 @@ generate() {
 }
 
 prepare_git() {
-	git log -U0 --diff-filter=AMD --reverse --pretty="%at000:%cn" $1 | \
-		grep -v "^--- " | \
-		grep -v "^+++ " | \
-		grep -v "^index " | \
-		grep -v "^Binary " | \
-		grep -v "^@@ " | \
-		grep -v "^[+-][ 	]*$" | \
-		grep -v "^[+-]$" | \
-		grep -v "^[ 	]*$" | \
-		sed -e "s/diff .* b\//\&/g" \
-			-e "s/^+[ 	]\+/+/g" \
-			-e "s/^-[ 	]\+/-/g" \
-			-e "s/[ 	]\+$//g" \
-			-e "s/^$//g" \
-			-e 's/\\/\\\\/g' \
-			-e "s/[\"\`<>$]//g" > $gitdiff
+    git log -U0 --diff-filter=AMD --reverse --pretty="%at000:%cn" $1 | \
+        grep -v "^\(-\{3\}\|+\{3\}\) " | \
+        grep -v "^[+-][ 	]*$" | \
+        grep -v "^[+-]$" | \
+        grep -v "^[ 	]*$" | \
+        sed -e "s/diff .* b\//\&/g" \
+            -e "s/^+[ 	]\+/+/g" \
+            -e "s/^-[ 	]\+/-/g" \
+            -e "s/[ 	]\+$//g" \
+            -e "s/^$//g" \
+            -e 's/\\/\\\\/g' \
+            -e "s/[\"\`<>$]//g" > $gitdiff
 }
 
 fileaction="$(date +%j%H%M%s)"
 
-[ -n "$1" ] && countcommit=$1 || echo -e "первым параметром передаетс€ лимит коммитов\ngit log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10" >&2
+[ -n "$1" ] && countcommit=$1 || echo -e "первым параметром передаетс€ лимит коммитов\n" + \
+    "git log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10" >&2
 echo -n "Ѕудет использован лимит: " >&2
 [ -n "$1" ] && echo $1' коммитов' >&2 || echo "все коммиты" >&2
 
 typehash=md5
-[ -n "$2" ] && typehash=$2 || echo -e "вторым параметром передаетс€ тип функции дл€ генерации хеша строки\nдоступны следующие значени€:\n\t\tmd5 Ч по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 -10 crypt" >&2
+[ -n "$2" ] && typehash=$2 || echo -e "вторым параметром передаетс€ тип функции дл€" + \
+    "генерации хеша строки\nдоступны следующие значени€:\n" + \
+    "\t\tmd5 Ч по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 -10 crypt" >&2
 echo "Ѕудет применена функци€: "$typehash >&2
 
 gitdiff=$fileaction".temp"
