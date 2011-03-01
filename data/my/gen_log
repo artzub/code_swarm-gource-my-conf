@@ -21,7 +21,7 @@ generatelog(){
 			#валидируем строку, появляются 4 переменные
 			eval $line;
 			#проверяем не пустали переменная date, если нет производим вывод
-			[ -n "$date" ] && [ "`echo $data | wc -c`" -eq "14" ] && date=`echo $data | sed -e "s/^\(.\{10\}\).*/\1/"`
+			[ -n "$date" ] && [ "`echo -n $data | wc -c`" -gt "10" ] && date=`echo $data | sed -e "s/^\(.\{10\}\).*/\1/"`
 			[ -n "$date" ] && echo "$date|$author|$action|$filename" >> $result
 			#отображение процесса генерации.
 			echo -ne "\b${state[$i]}"
