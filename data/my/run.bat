@@ -19,6 +19,10 @@ pushd png
 call "..\tools\nt\mencoder" mf://*.png -mf fps=19:type=png -ovc x264 -x264encopts pass=1:bitrate=1000 -oac copy -audiofile "..\data\audio.wav" -o "..\results\result.avi"
 popd
 
+pushd png
+del *.png
+popd
+
 pushd "tools\gource"
 call gource.exe --hide filenames,dirnames --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-all-users --seconds-per-day 1 --output-ppm-stream "..\..\results\resultgource.ppm" "..\..\data\gource.log"
 ::--user-image-dir "logos" --follow-user "artzub" --default-user-image "default.png" 

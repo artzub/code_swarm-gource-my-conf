@@ -14,21 +14,21 @@ generatelog(){
 		grep -e "event " $1 | \
 		#удаляем все символы табуляции и пробелы
 		#удаляем все <event и />
-		sed -e "s/^[ 	]*//;s/^<event //g;s|/>$||g" | \
+		sed -e "s/^[ \\t]*//;s/^<event //g;s|/>$||g" | \
 		while read line
 		do
 			date=""
 			#валидируем строку, появляются 4 переменные
 			eval $line;
 			#проверяем не пустали переменная date, если нет производим вывод
-			[ -n "$date" ] && [ "`echo -n $data | wc -c`" -gt "10" ] && date=`echo $data | sed -e "s/^\(.\{10\}\).*/\1/"`
+			[ -n "$date" ] && [ ${#data} -gt 10 ] && date=${data:0:10}
 			[ -n "$date" ] && echo "$date|$author|$action|$filename" >> $result
 			#отображение процесса генерации.
-			echo -ne "\b${state[$i]}"
+			echo -ne "${state[$i]}\b"
 			(( i += 1 ))
 			[[ $i -eq 5 ]] && i=0
 		done 
-		echo -ne "\bcompleted!"
+		echo -ne "completed!"
 	else
 		echo -e "file log code_swarm not exsits!\n$1"
 	fi

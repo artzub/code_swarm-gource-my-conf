@@ -10,7 +10,9 @@ generate() {
 
 	awk -v typegen=$1 '
 		BEGIN {
-			split("\b\b\b\b\b. . . . . \b- \b\b- \b\b- \b\b- \b\b- \b= = = = =", st, " ")
+			split(". . . . . \b- \b\b- \b\b- \b\b- \b\b- \b= = = = = \b\b\b\b\b", st, " ")
+            #eсли запускать под debian, то
+            #split(". . . . . \\b- \\b\\b- \\b\\b- \\b\\b- \\b\\b- \\b= = = = = \\b\\b\\b\\b\\b", st, " ")
 			ist=0
 			_ord_init()
 
@@ -59,7 +61,7 @@ generate() {
 			substr($0, 2, length($0) - 1);
 			next;
 		}
-		/^+/ { a="A"; }
+        { a="A"; }
 		/^-/ { a="D"; }
 		/^[\+-]/ {
 			sub(/[\+-]/, "")
@@ -81,13 +83,16 @@ generate() {
 
 			if (str != "")
 				print "<event date=\""d"\" author=\""f"\" filename=\""str"\" action=\""a"\"  comment=\"\"/>"
-				
-			system("echo -ne \"" st[ist++] "\" >&2")
+			cmd = "echo -ne \"" st[ist++] "\" >&2"
+            #eсли запускать под debian, то
+            #cmd = "bash \"echo -ne \\\"" st[ist++] "\\\" >&2\""
+			system(cmd)
+            close(cmd)
 			if (ist > 16) ist=0
 		}
 	' $gitdiff
 
-	echo -ne "\b\b\b\b\b\b\b\b\b\b\b\bcompleted!" >&2
+	echo -e "\n\1 completed \2" >&2
 	echo "</file_events>"
 	rm $gitdiff
 }
@@ -95,13 +100,13 @@ generate() {
 prepare_git() {
     git log -U0 --diff-filter=AMD --reverse --pretty="%at000:%cn" $1 | \
         grep -v "^\(-\{3\}\|+\{3\}\) " | \
-        grep -v "^[+-][ 	]*$" | \
+        grep -v "^[+-][ \\t]*$" | \
         grep -v "^[+-]$" | \
-        grep -v "^[ 	]*$" | \
+        grep -v "^[ \\t]*$" | \
         sed -e "s/diff .* b\//\&/g" \
-            -e "s/^+[ 	]\+/+/g" \
-            -e "s/^-[ 	]\+/-/g" \
-            -e "s/[ 	]\+$//g" \
+            -e "s/^+[ \\t]\+/+/g" \
+            -e "s/^-[ \\t]\+/-/g" \
+            -e "s/[ \\t]\+$//g" \
             -e "s/^$//g" \
             -e 's/\\/\\\\/g' \
             -e "s/[\"\`<>$]//g" > $gitdiff
@@ -110,14 +115,14 @@ prepare_git() {
 fileaction="$(date +%j%H%M%s)"
 
 typehash=md5
-[ -n "$1" ] && typehash=$1 || echo -e "первым параметром передаетс€ тип функции дл€" + \
-    "генерации хеша строки\nдоступны следующие значени€:\n" + \
-    "\t\tmd5 Ч по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 crypt" >&2
+[ -n "$1" ] && typehash=$1 || echo -e "первым параметром передаетс€ тип функции дл€"  \
+"генерации хеша строки\nдоступны следующие значени€:\n"  \
+"\t\tmd5 Ч по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 crypt" >&2
 echo "Ѕудет применена функци€: "$typehash >&2
 
 
-[ -n "$2" ] && countcommit=$2 || echo -e "вторым параметром передаетс€ лимит коммитов\n" + \
-    "git log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 crypt -10" >&2
+[ -n "$2" ] && countcommit=$2 || echo -e "вторым параметром передаетс€ лимит коммитов\n"  \
+"git log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 crypt -10" >&2
 echo -n "Ѕудет использован лимит: " >&2
 [ -n "$2" ] && echo $2' коммитов' >&2 || echo "все коммиты" >&2
 
