@@ -1,0 +1,33 @@
+allline=`sed -n $= "$1"`
+
+awk -v alll=$allline '
+    BEGIN { 
+        step = alll / 4; 
+        curPos = 0; 
+        curNum = 1;
+        split(". .. ... .... ..... - -- --- ---- ----- = == === ==== =====", st, " ");
+        ist=0;
+        pres=100/alll;
+    }
+    {
+        print $0 > "actions_" curNum ".xml";
+        curPos++;
+        if(curPos >= step){
+            curPos = 0;
+            print "</file_events>" > "actions_" curNum ".xml";
+            curNum++;
+            print "<?xml version=\"1.0\"?><file_events>" > "actions_" curNum ".xml";
+        }        
+        #cmd = "echo -ne \"\\r                                 \\r" FNR * pres "% " st[ist++] "\" >&2"
+        cmd = "bash \"echo -ne \\\"\\\\r                                 \\\\r" FNR * pres "% " st[ist++] "\\\" >&2\""        
+		system(cmd)
+        close(cmd)
+		if (ist > 15) ist=0
+    }
+    END {
+        if (curPos < step && curPos > 0) {
+            curPos = 0;
+            print "</file_events>" > "actions_" curNum ".xml";
+        }
+    }
+' $1

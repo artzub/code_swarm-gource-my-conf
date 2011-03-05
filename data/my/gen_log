@@ -5,7 +5,7 @@ uses(){
 
 generatelog(){
 	echo "genereting... "
-	state=("\\" "|" "/" "—")
+	state=("\\" "|" "/" "-")
 	i=0
 	if [ -f "$1" ]; then
 		result=${1%.*}'.log'
@@ -21,14 +21,14 @@ generatelog(){
 			#валидируем строку, появляются 4 переменные
 			eval $line;
 			#проверяем не пустали переменная date, если нет производим вывод
-			[ -n "$date" ] && [ ${#data} -gt 10 ] && date=${data:0:10}
+			[ -n "$date" ] && [ ${#date} -gt 10 ] && date=${date:0:10}
 			[ -n "$date" ] && echo "$date|$author|$action|$filename" >> $result
 			#отображение процесса генерации.
-			echo -ne "${state[$i]}\b"
+			echo -ne "\r \r${state[$i]}"
 			(( i += 1 ))
 			[[ $i -eq 5 ]] && i=0
 		done 
-		echo -ne "completed!"
+		echo -ne "\rcompleted!"
 	else
 		echo -e "file log code_swarm not exsits!\n$1"
 	fi

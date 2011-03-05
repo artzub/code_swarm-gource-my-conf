@@ -3,11 +3,23 @@
 :: call sortDate.exe data\actions_orign.xml
 :: ren data\actions_res.xml actions.xml
 
-call sh gen_log ./data/actions.xml
+set rundir=%~d0
 
-call sh sort_log ./data/actions.log > data\gource.log
+set curRes=%1
+if "%curRes%" == "" (
+    set curRes=%rundir%
+)
 
-pushd png
+echo %2
+
+if not "%2" == "" (
+    call sh gen_log ./data/actions.xml
+
+    call sh sort_log ./data/actions.log > data\gource.log
+    del data\actions.log
+)
+
+pushd "%curRes%\png"
 del *.png
 popd
 
@@ -15,28 +27,27 @@ pushd ..\..
 call run.bat data\my\my.config
 popd
 
-pushd png
-call "..\tools\nt\mencoder" mf://*.png -mf fps=19:type=png -ovc x264 -x264encopts pass=1:bitrate=1000 -oac copy -audiofile "..\data\audio.wav" -o "..\results\result.avi"
+pushd "%curRes%\png"
+call "%rundir%\tools\nt\mencoder" mf://*.png -mf fps=19:type=png -ovc x264 -x264encopts pass=1:bitrate=1000 -oac copy -audiofile "%rundir%\data\audio.wav" -o "%curRes%\results\result.avi"
 popd
 
-pushd png
+pushd "%curRes%\png"
 del *.png
 popd
 
 pushd "tools\gource"
-call gource.exe --bloom-intensity 0.35 -b 333333 --hide filenames,dirnames --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-all-users --seconds-per-day 1 --output-ppm-stream "..\..\results\resultgource.ppm" "..\..\data\gource.log"
+call gource.exe --bloom-intensity 0.35 -b 333333 --hide filenames,dirnames --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-all-users --seconds-per-day 1 --output-ppm-stream "%curRes%\results\resultgource.ppm" "%rundir%\data\gource.log"
 ::--user-image-dir "logos" --follow-user "artzub" --default-user-image "default.png" 
 popd
 
 pushd "tools\nt"
-call ffmpeg -y -b 9000K -f image2pipe -vcodec ppm -i "..\..\results\resultgource.ppm" -fpre "..\ll.ffpreset" -i "..\..\results\resultgource.ppm" -vcodec libx264 "..\..\results\resultgource.avi"
+call ffmpeg -y -b 9000K -f image2pipe -vcodec ppm -i "%curRes%\results\resultgource.ppm" -fpre "..\ll.ffpreset" -i "%curRes%\results\resultgource.ppm" -vcodec libx264 "%curRes%\results\resultgource.avi"
 
-del results\resultgource.ppm
+del "%curRes%\results\resultgource.ppm"
 
-call mencoder "..\..\results\resultgource.avi" -ovc x264 -x264encopts pass=1:bitrate=10000 -ofps 19 -speed 2 -o "..\..\results\resultgource.fps"
+call mencoder "%curRes%\results\resultgource.avi" -ovc x264 -x264encopts pass=1:bitrate=10000 -ofps 19 -speed 2 -o "%curRes%\results\resultgource.fps"
 
-call mencoder "..\..\results\resultgource.fps" -ovc x264 -x264encopts pass=1:bitrate=10000 -oac copy -audiofile "..\..\data\audio.wav" -o "..\..\results\resultgource.avi"
+call mencoder "%curRes%\results\resultgource.fps" -ovc x264 -x264encopts pass=1:bitrate=10000 -oac copy -audiofile "%rundir%\data\audio.wav" -o "%curRes%\results\resultgource.avi"
 popd
 
-del results\resultgource.fps
-del data\actions.log
+del %curRes%\results\resultgource.fps

@@ -85,7 +85,7 @@ generate() {
 				print "<event date=\""d"\" author=\""f"\" filename=\""str"\" action=\""a"\"  comment=\"\"/>"
 			cmd = "echo -ne \"" st[ist++] "\" >&2"
             #eсли запускать под debian, то
-            #cmd = "bash \"echo -ne \\\"" st[ist++] "\\\" >&2\""
+            #cmd = "bash -c \"echo -ne \\\"" st[ist++] "\\\" >&2\""
 			system(cmd)
             close(cmd)
 			if (ist > 16) ist=0
