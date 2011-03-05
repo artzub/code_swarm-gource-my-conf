@@ -21,8 +21,9 @@ generatelog(){
 			#валидируем строку, появляются 4 переменные
 			eval $line;
 			#проверяем не пустали переменная date, если нет производим вывод
-			[ -n "$date" ] && [ ${#date} -gt 10 ] && date=${date:0:10}
-			[ -n "$date" ] && echo "$date|$author|$action|$filename" >> $result
+            [ "$file" == "." ] && date=""
+            [ -n "$date" ] && [ ${#date} -gt 10 ] && date=${date:0:10}
+            [ -n "$date" ] && echo "$date|$author|$action|$filename" >> $result
 			#отображение процесса генерации.
 			echo -ne "\r \r${state[$i]}"
 			(( i += 1 ))

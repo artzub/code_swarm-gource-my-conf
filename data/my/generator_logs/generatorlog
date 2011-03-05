@@ -7,12 +7,11 @@ generate() {
 
 	echo -e "<?xml version=\"1.0\"?>\n<file_events>"
 	echo "generating ..." >&2
+    allline=`sed -n $= $gitdiff`
 
-	awk -v typegen=$1 '
+	awk -v typegen=$1 -v alll=$allline '
 		BEGIN {
-			split(". . . . . \b- \b\b- \b\b- \b\b- \b\b- \b= = = = = \b\b\b\b\b", st, " ")
-            #eсли запускать под debian, то
-            #split(". . . . . \\b- \\b\\b- \\b\\b- \\b\\b- \\b\\b- \\b= = = = = \\b\\b\\b\\b\\b", st, " ")
+			split(". .. ... .... ..... - -- --- ---- ------ = == === ==== =====", st, " ")            
 			ist=0
 			_ord_init()
 
@@ -38,14 +37,14 @@ generate() {
 				low = 0
 				high = 255
 			}
-
+            
 			for (i = low; i <= high; i++) {
 				t = sprintf("%c", i)
 				_ord_[t] = i
 			}
 		}
 
-		function ord(str, c) {
+		function ord(str, c) {        
 			c = substr(str, 1, 1);
 			return _ord_[c];
 		}
@@ -64,35 +63,38 @@ generate() {
         { a="A"; }
 		/^-/ { a="D"; }
 		/^[\+-]/ {
-			sub(/[\+-]/, "")
-			str=""
-			if( typehash == 1) {
-				for(i=1; i<length($0); i++){
-					str = str "" ord(substr($0, i, 1))
-				}
-				gsub(/32|16/, "/sd", str);
-				str = substr(str, 0, length(str)-2) "." substr(str, length(str)-1, 2);
-			}
-			else {
-				cmd="echo \"" $0 "\" | md5sum | cut -f1 -d \" \" | sed -e \"s@[32|16]@/sd@g;\" -e \"s/\\(..\\)\$/.\\1/\"" 
-				if ( typehash == 2 )
-					cmd="C:/Perl/bin/perl -e \"print crypt($ARGV[0], $ARGV[1])\" \"" $0 "\" \"1/5l58j/jk\"" 
-				cmd | getline str;
-				close(cmd);
-			}
+            sub(/[\+-]/, "")
+            if (length($0) > 0){
+                str=""
+                if( typehash == 1) {
+                    for(i=0; i<length($0); i++){
+                        str = str "" ord(substr($0, i, 1))
+                    }                    
+                    gsub(/32|16/, "/sd", str);                    
+                    if(length(str) > 2)
+                        str = substr(str, 0, length(str)-2) "." substr(str, length(str)-1, 2);
+                }
+                else {
+                    cmd="echo \"" $0 "\" | md5sum | cut -f1 -d \" \" | sed -e \"s@[32|16]@/sd@g;\" -e \"s/\\(..\\)\$/.\\1/\"" 
+                    if ( typehash == 2 )
+                        cmd="C:/Perl/bin/perl -e \"print crypt($ARGV[0], $ARGV[1])\" \"" $0 "\" \"1/5l58j/jk\"" 
+                    cmd | getline str;
+                    close(cmd);
+                }
 
-			if (str != "")
-				print "<event date=\""d"\" author=\""f"\" filename=\""str"\" action=\""a"\"  comment=\"\"/>"
-			cmd = "echo -ne \"" st[ist++] "\" >&2"
+                if (str != "")
+                    print "<event date=\""d"\" author=\""f"\" filename=\""str"\" action=\""a"\"  comment=\"\"/>"
+            }
+			cmd = "echo -ne \"\\r\\t\\t\\t\\t\\t\\r" FNR "/" alll " " st[ist++] "\" >&2"
             #eсли запускать под debian, то
-            #cmd = "bash -c \"echo -ne \\\"" st[ist++] "\\\" >&2\""
+            #cmd = "bash -c \"echo -ne \\\"\\\\r\\\\t\\\\t\\\\t\\\\t\\\\t\\\\r" FNR "/" alll " " st[ist++] "\\\" >&2\""
 			system(cmd)
             close(cmd)
 			if (ist > 16) ist=0
 		}
 	' $gitdiff
 
-	echo -e "\n\1 completed \2" >&2
+	echo -e "\n\r\t\t\t\t\t\r\1 completed \2" >&2
 	echo "</file_events>"
 	rm $gitdiff
 }
