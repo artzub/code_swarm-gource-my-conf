@@ -1,16 +1,11 @@
-:: del data\actions_orign.xml
-:: ren data\actions.xml actions_orign.xml
-:: call sortDate.exe data\actions_orign.xml
-:: ren data\actions_res.xml actions.xml
-
-set rundir=%~d0
+echo off
+set rundir=%~p0
+set rundir=%rundir:~0,-1%
 
 set curRes=%1
 if "%curRes%" == "" (
     set curRes=%rundir%
 )
-
-echo %2
 
 if not "%2" == "" (
     call sh gen_log ./data/actions.xml
@@ -19,9 +14,11 @@ if not "%2" == "" (
     del data\actions.log
 )
 
+
 pushd "%curRes%\png"
 del *.png
 popd
+echo on
 
 pushd ..\..
 call run.bat data\my\my.config
