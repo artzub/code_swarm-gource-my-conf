@@ -1,6 +1,6 @@
 echo off
 set rundir=%~p0
-set rundir=%rundir:~0,-1%
+set rundir=%~d0%rundir:~0,-1%
 
 set curRes=%1
 if "%curRes%" == "" (

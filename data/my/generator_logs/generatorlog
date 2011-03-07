@@ -7,12 +7,13 @@ generate() {
 
 	echo -e "<?xml version=\"1.0\"?>\n<file_events>"
 	echo "generating ..." >&2
-    allline=`sed -n $= $gitdiff`
+	allline=`sed -n $= $gitdiff`
 
 	awk -v typegen=$1 -v alll=$allline '
 		BEGIN {
 			split(". .. ... .... ..... - -- --- ---- ------ = == === ==== =====", st, " ")            
 			ist=0
+			pres=100/alll;
 			_ord_init()
 
 			typehash=0
@@ -63,33 +64,33 @@ generate() {
         { a="A"; }
 		/^-/ { a="D"; }
 		/^[\+-]/ {
-            sub(/[\+-]/, "")
-            if (length($0) > 0){
-                str=""
-                if( typehash == 1) {
-                    for(i=0; i<length($0); i++){
-                        str = str "" ord(substr($0, i, 1))
-                    }                    
-                    gsub(/32|16/, "/sd", str);                    
-                    if(length(str) > 2)
-                        str = substr(str, 0, length(str)-2) "." substr(str, length(str)-1, 2);
-                }
-                else {
-                    cmd="echo \"" $0 "\" | md5sum | cut -f1 -d \" \" | sed -e \"s@[32|16]@/sd@g;\" -e \"s/\\(..\\)\$/.\\1/\"" 
-                    if ( typehash == 2 )
-                        cmd="C:/Perl/bin/perl -e \"print crypt($ARGV[0], $ARGV[1])\" \"" $0 "\" \"1/5l58j/jk\"" 
-                    cmd | getline str;
-                    close(cmd);
-                }
+			sub(/[\+-]/, "")
+			if (length($0) > 0){
+				str=""
+				if( typehash == 1) {
+					for(i=0; i<length($0); i++){
+						str = str "" ord(substr($0, i, 1))
+					}
+					gsub(/32|16/, "/sd", str);
+					if(length(str) > 2)
+						str = substr(str, 0, length(str)-1) "." substr(str, length(str)-1, 2);
+				}
+				else {
+					cmd="echo \"" $0 "\" | md5sum | cut -f1 -d \" \" | sed -e \"s@[32|16]@/sd@g;\" -e \"s/\\(..\\)\$/.\\1/\"" 
+					if ( typehash == 2 )
+						cmd="C:/Perl/bin/perl -e \"print crypt($ARGV[0], $ARGV[1])\" \"" $0 "\" \"1/5l58j/jk\"" 
+					cmd | getline str;
+					close(cmd);
+				}
 
-                if (str != "")
-                    print "<event date=\""d"\" author=\""f"\" filename=\""str"\" action=\""a"\"  comment=\"\"/>"
-            }
-			cmd = "echo -ne \"\\r\\t\\t\\t\\t\\t\\r" FNR "/" alll " " st[ist++] "\" >&2"
-            #eсли запускать под debian, то
-            #cmd = "bash -c \"echo -ne \\\"\\\\r\\\\t\\\\t\\\\t\\\\t\\\\t\\\\r" FNR "/" alll " " st[ist++] "\\\" >&2\""
+				if (str != "")
+					print "<event date=\""d"\" author=\""f"\" filename=\""str"\" action=\""a"\"  comment=\"\"/>"
+			}
+			cmd = "echo -ne \"\\r\\t\\t\\t\\t\\t\\r" FNR "/" alll "(" FNR * pres "%) " st[ist++] "\" >&2"
+			#eсли запускать под debian, то
+			#cmd = "bash -c \"echo -ne \\\"\\\\r\\\\t\\\\t\\\\t\\\\t\\\\t\\\\r" FNR "/" alll "(" FNR * pres "%) " st[ist++] "\\\" >&2\""
 			system(cmd)
-            close(cmd)
+			close(cmd)
 			if (ist > 16) ist=0
 		}
 	' $gitdiff
@@ -100,18 +101,18 @@ generate() {
 }
 
 prepare_git() {
-    git log -U0 --diff-filter=AMD --reverse --pretty="%at000:%cn" $1 | \
-        grep -v "^\(-\{3\}\|+\{3\}\) " | \
-        grep -v "^[+-][ \\t]*$" | \
-        grep -v "^[+-]$" | \
-        grep -v "^[ \\t]*$" | \
-        sed -e "s/diff .* b\//\&/g" \
-            -e "s/^+[ \\t]\+/+/g" \
-            -e "s/^-[ \\t]\+/-/g" \
-            -e "s/[ \\t]\+$//g" \
-            -e "s/^$//g" \
-            -e 's/\\/\\\\/g' \
-            -e "s/[\"\`<>$]//g" > $gitdiff
+	git log -U0 --diff-filter=AMD --reverse --pretty="%at000:%cn" $1 | \
+		grep -v "^\(-\{3\}\|+\{3\}\) " | \
+		grep -v "^[+-][ \\t]*$" | \
+		grep -v "^[+-]$" | \
+		grep -v "^[ \\t]*$" | \
+		sed -e "s/diff .* b\//\&/g" \
+			-e "s/^+[ \\t]\+/+/g" \
+			-e "s/^-[ \\t]\+/-/g" \
+			-e "s/[ \\t]\+$//g" \
+			-e "s/^$//g" \
+			-e 's/\\/\\\\/g' \
+			-e "s/[\"\`<>$]//g" > $gitdiff
 }
 
 fileaction="$(date +%j%H%M%s)"
