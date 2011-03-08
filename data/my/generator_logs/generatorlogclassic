@@ -1,0 +1,64 @@
+#!/bin/sh
+
+generate() {
+	if test -t 1; then
+		exec >$logfile
+	fi
+
+	echo -e "<?xml version=\"1.0\"?>\n<file_events>"
+	echo "generating ..." >&2
+	allline=`sed -n $= $gitdiff`
+
+	awk -v alll=$allline '
+		BEGIN {
+			split(". .. ... .... ..... - -- --- ---- ------ = == === ==== =====", st, " ")
+			ist=0
+			pres=100/alll;
+		}
+
+		/^[0-9]/ {
+			u=$0
+			d=$0
+			sub(/:.*/, "", d);
+			sub(/[^:]*:/, "", u);
+			next;
+		}
+		/^[ACDMRTUXB]/ {
+			a=substr($0, 0, 1)
+			sub(/[ACDMRTUXB]/, "")
+			if (length($0) > 0){
+				print "<event date=\""d"\" author=\""u"\" filename=\""$0"\" action=\""a"\"  comment=\"\"/>"
+			}
+			cmd = "echo -ne \"\\r                               \\r" FNR "/" alll "(" FNR * pres "%) " st[ist++] "\" >&2"
+			#eсли запускать под debian, то
+			#cmd = "bash -c \"echo -ne \\\"\\\\r                               \\\\r" FNR "/" alll "(" FNR * pres "%) " st[ist++] "\\\" >&2\""
+			system(cmd)
+			close(cmd)
+			if (ist > 16) ist=0
+		}
+	' $gitdiff
+	
+	echo -ne "\r                               \r$allline/$allline (100%)" >&2
+	echo -e "\n\1 completed \2" >&2
+	echo "</file_events>"
+	rm $gitdiff
+}
+
+prepare_git() {
+	git log --name-status --reverse --pretty="%at000:%cn" $1 | \
+		grep -v "^[ \\t]*$" | \
+		sed -e "s/^\([ACDMRTUXB]\)[ \\t]\+/\1/g" > $gitdiff
+}
+
+fileaction="$(date +%j%H%M%s)"
+
+[ -n "$1" ] && countcommit=$1 || echo -e "вторым параметром передается лимит коммитов\n"  \
+"git log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10" >&2
+echo -n "Будет использован лимит: " >&2
+[ -n "$1" ] && echo $1' коммитов' >&2 || echo "все коммиты" >&2
+
+gitdiff=$fileaction".temp"
+logfile=$fileaction"action.xml"
+
+prepare_git $countcommit
+generate
