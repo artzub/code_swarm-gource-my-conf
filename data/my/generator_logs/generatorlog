@@ -9,7 +9,7 @@ generate() {
 	echo "generating ..." >&2
 	allline=`sed -n $= $gitdiff`
 
-	awk -v typegen=$1 -v alll=$allline '
+	awk -v typegen=$1 -v alll=$allline -v typeuser=$2 '
 		BEGIN {
 			split(". .. ... .... ..... - -- --- ---- ------ = == === ==== =====", st, " ")            
 			ist=0
@@ -23,6 +23,10 @@ generate() {
 			else if( typegen == "crypt" ) {
 				typehash=2
 			}
+
+			tu=0
+			if( typeuser == "file" )
+				tu=1
 		}
 
 		function _ord_init(low, high, i, t)
@@ -51,14 +55,19 @@ generate() {
 		}
 
 		/^[0-9]/ { 
-			sub(/:.*/, "");
-			d=$0;
+			u=$0
+			d=$0
+			sub(/:.*/, "", d);
+			sub(/[^:]*:/, "", u);
 			next;
 		}
 		/^&/ {
-			sub(/&/, "");
-			f=$0
-			substr($0, 2, length($0) - 1);
+			f=u
+			if ( tu == 1 ) {
+				sub(/&/, "");
+				f=$0
+				substr($0, 2, length($0) - 1);
+			}
 			next;
 		}
         { a="A"; }
@@ -123,7 +132,6 @@ typehash=md5
 "\t\tmd5 Ч по-умолчанию\n\t\tcrypt\n\t\tch_code\nusing: $0 crypt" >&2
 echo "Ѕудет применена функци€: "$typehash >&2
 
-
 [ -n "$2" ] && countcommit=$2 || echo -e "вторым параметром передаетс€ лимит коммитов\n"  \
 "git log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 crypt -10" >&2
 echo -n "Ѕудет использован лимит: " >&2
@@ -133,4 +141,4 @@ gitdiff=$fileaction".temp"
 logfile=$fileaction"action.xml"
 
 prepare_git $countcommit
-generate $typehash
+generate $typehash $3
