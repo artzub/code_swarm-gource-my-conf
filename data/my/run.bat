@@ -1,4 +1,4 @@
-echo off
+echo on
 set rundir=%~p0
 set rundir=%~d0%rundir:~0,-1%
 
@@ -10,10 +10,9 @@ if "%curRes%" == "" (
 if not "%2" == "" (
     call sh gen_log ./data/actions.xml
 
-    call sh sort_log ./data/actions.log > data\gource.log
+	call sh sort_log ./data/actions.log > data\gource.log
     del data\actions.log
 )
-
 
 pushd "%curRes%\png"
 del *.png
@@ -33,7 +32,7 @@ del *.png
 popd
 
 pushd "tools\gource"
-call gource.exe --bloom-intensity 0.35 -b 333333 --hide filenames,dirnames --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-all-users --seconds-per-day 1 --output-ppm-stream "%curRes%\results\resultgource.ppm" "%rundir%\data\gource.log"
+call gource.exe --bloom-intensity 0.35 -b 333333 --hide filenames,dirnames --user-scale 2 --output-framerate 25 --user-image-dir "logos" --follow-user "artzub" --default-user-image "default.png" --stop-position 1 --highlight-all-users --seconds-per-day 1 --output-ppm-stream "%curRes%\results\resultgource.ppm" "%rundir%\data\gource.log"
 ::--user-image-dir "logos" --follow-user "artzub" --default-user-image "default.png" 
 popd
 
