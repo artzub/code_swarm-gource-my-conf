@@ -1,2 +1,3 @@
 #!/bin/sh
-/bin/sort -b -nk1 -k3 -t \| $1
+#-k3
+/bin/sort -b -nk1 -t \| $1
