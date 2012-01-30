@@ -169,7 +169,10 @@ options:
     --multi-sampling
             Enable multi-sampling.
 
-    --bloom-multiplier FLOAT
+    --no-vsync
+            Disable vsync.
+
+     --bloom-multiplier FLOAT
             Adjust the amount of bloom.
 
     --bloom-intensity FLOAT
@@ -210,6 +213,7 @@ options:
             filenames - names of files
             mouse     - mouse cursor
             progress  - progress bar widget
+            root      - root directory of tree
             tree      - animated tree structure
             users     - user avatars
             usernames - names of users

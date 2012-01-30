@@ -1,3 +1,37 @@
+0.37:
+ * Made SVN log GMT timestamp conversion fix portable.
+
+0.36:
+ * Fixed SVN log GMT timestamp conversion.
+ * Fixed issue with sub-dirs of deleted dir not being removed in some cases.
+
+0.35:
+ * Added long file extension truncation handling to file key (--key).
+ * Treat changes in Mercurial log files with the same time/user as one commit.
+ * Fixed handling of spaces in directory names with Mercurial.
+ * Fixed --font-colour option.
+
+0.34:
+ * Now using VBOs and shaders for faster rendering when OpenGL 2.0 is available.
+ * Eliminated bloom colour banding artifacts (requires OpenGL 2.0).
+ * New font rendering library derived from FTGL (FTGL no longer required).
+ * Single pass font/shadow rendering (with lots of help from Chris Forbes).
+ * Added --no-vsync option.
+ * Fixed bug where tree is out of alignment with object positions in windowed
+   mode due to using the wrong display dimensions internally.
+ * Removed default max-files limit.
+
+0.33:
+ * Added --hide root option to not draw branches from the root directory.
+ * Fixed log parsing of Bazaar merges and tagged commits.
+ * --output-custom-log now skips unparsed log entries instead of exiting.
+
+0.32:
+ * Fixed behaviour of user camera tracking.
+
+0.31:
+ * Added --with-tinyxml option to configure (use the system TinyXML library).
+
 0.30:
  * Fixed crash when SVN log entry contains no 'paths' element.
  * Handle directory deletion (happens in SVN logs).

@@ -41,19 +41,20 @@ call run.bat data\my\my.config
 popd
 
 pushd "%png%"
-call "%mencoder%" mf://*.png -mf fps=12:type=png -ovc x264 -x264encopts pass=1:bitrate=5000 -oac copy -audiofile "%rundir%\data\audio.wav" -o "%results%\result.avi"
+call "%mencoder%" mf://*.png -mf fps=12:type=png -ovc x264 -x264encopts pass=1:bitrate=5000 -oac copy -audiofile "%rundir%\data\audio.mp3" -o "%results%\result.avi"
 popd
 
 pushd "%curRes%\png"
 del *.png
 popd
 
+
 :gource
 
 if not exist data\gource.log goto logstalgia
 
 pushd "tools\gource"
-call gource.exe --bloom-intensity 0.35 -b 333333 -1280x720 --hide filenames,dirnames --user-scale 2 --output-framerate 25 --user-image-dir "%rundir%\logos"  --stop-position 1 --highlight-all-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --user-image-dir "%rundir%\logos" --follow-user "Larry Page"
+call gource.exe --bloom-intensity 0.35 -b 333333 -1280x720 --hide filenames,dirnames,mouse,progress --user-scale 2 --output-framerate 25 --user-image-dir "%rundir%\logos"  --stop-position 1 --highlight-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --user-image-dir "%rundir%\logos" --key --multi-sampling --auto-skip-seconds 1 --elasticity 0.00001 --time-scale 2
 :: --default-user-image "default" 
 popd
 
