@@ -1,14 +1,20 @@
 #!/bin/sh
 uses(){
-	echo -e 'using\n$0 file_codeswarm.xml'
+	echo -e 'using\n$0 file_codeswarm.xml [-g|-l]'
 }
 
-generatelog(){
+generatelog(){	
 	echo "genereting... "
 	state=("\\" "|" "/" "-")
 	i=0
 	if [ -f "$1" ]; then
-		result=${1%.*}'.log'
+		
+		type="$2"
+		result="$3"
+		
+		[ -n "$type" ] || type="-g"
+		[ -n "$result" ] || result=${1%.*}'.log'
+		
 		echo -n > $result
 		#Выводим только строки в которых есть слово event
 		grep -e "event " $1 | \
@@ -22,9 +28,13 @@ generatelog(){
 			eval $line;
 			#проверяем не пустали переменная date, если нет производим вывод
             [ "$file" == "." ] && date=""
-            [ -n "$date" ] && echo "${date%000}|$author|$action|$filename" >> $result
+			if [ -n "$date" ]; then			
+				str="${date%000}|$author|$action|$filename";
+				[ "type" == "-l" ] && str="${date%000}|$author|$filename|$action|${#filename}" 
+				echo $str >> $result
+			fi
 			#отображение процесса генерации.
-			echo -ne "\r \r${state[$i]}"
+			echo -ne "\r \r${state[$i]}" >&2
 			(( i += 1 ))
 			[[ $i -eq 5 ]] && i=0
 		done 
@@ -33,5 +43,21 @@ generatelog(){
 		echo -e "file log code_swarm not exsits!\n$1"
 	fi
 }
+echo "-------"
 
-[ -n "$1" ] && generatelog $1 || uses 
+type='-g'
+result=${1%.*}'.log'
+
+for arg
+do
+	case "$arg" in		
+		-o*)
+			result=`echo $arg | sed -e 's/-o//' -e 's/=//'`
+		;;
+		-[gl])
+			type=$arg
+		;;
+	esac
+done;
+
+[ -n "$1" ] && generatelog $1 $type $result || uses

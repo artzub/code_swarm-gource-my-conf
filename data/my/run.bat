@@ -16,7 +16,8 @@ set results=%curRes%\results
 
 ::if not "%2" == "" (
 	::call sh gen_log ./data/actions.xml
-
+	::call sh gen_log ./data/actions.xml -o=./data/actlogs.log -l
+pause
 	del data\gource.log
 	del data\logstalgia.log
 	
@@ -54,8 +55,8 @@ popd
 if not exist data\gource.log goto logstalgia
 
 pushd "tools\gource"
-call gource.exe --bloom-intensity 0.35 -b 333333 -1280x720 --hide filenames,dirnames,mouse,progress --user-scale 2 --output-framerate 25 --user-image-dir "%rundir%\logos"  --stop-position 1 --highlight-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --user-image-dir "%rundir%\logos" --key --multi-sampling --auto-skip-seconds 1 --elasticity 0.00001 --time-scale 2
-:: --default-user-image "default" 
+call gource.exe --bloom-intensity 0.35 -b 333333 -1280x720 --hide filenames,dirnames,mouse,progress --user-scale 2 --output-framerate 25 --user-image-dir "%rundir%\logos"  --stop-position 1 --highlight-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --key --multi-sampling --auto-skip-seconds 1 --time-scale 1 --follow-user "Pavel Roskin <proski@gnu.org>" -i 0 --user-image-dir "%rundir%\..\..\image_cache"
+:: --default-user-image "default" --elasticity 1
 popd
 
 pushd "tools\nt"

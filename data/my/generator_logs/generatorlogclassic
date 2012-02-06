@@ -45,20 +45,54 @@ generate() {
 }
 
 prepare_git() {
-	git log --name-status --reverse --pretty="%at000:%cn" $1 | \
+	git log --name-status --reverse --pretty="%at000:$1" $2 | \
 		grep -v "^[ \\t]*$" | \
 		sed -e "s/^\([ACDMRTUXB]\)[ \\t]\+/\1/g" > $gitdiff
 }
 
 fileaction="$(date +%j%H%M%s)"
 
-[ -n "$1" ] && countcommit=$1 || echo -e "вторым параметром передается лимит коммитов\n"  \
-"git log --help\nпараметер:\t-<n>\n\t\tLimits the number of commits to show.\nusing: $0 -10" >&2
+n=0
+e=0
+username=""
+
+for arg
+do
+	case "$arg" in
+		-n)			
+			[[ $n -eq 0 ]] && username="%cn"$username
+			n=1
+		;;
+		-e)
+			[[ $e -eq 0 ]] && username=$username"%ce"
+			e=1
+		;;
+		-en)
+			e=1
+			n=1
+			username="&lt;%ce&gt; %cn"
+		;;
+		-ne)
+			e=1
+			n=1
+			username="%cn &lt;%ce&gt;>"
+		;;
+		-[0-9])
+			countcommit=$arg
+		;;
+	esac
+done;
+
+[ -n "$username" ] || username="%cn" 
+
 echo -n "Будет использован лимит: " >&2
-[ -n "$1" ] && echo $1' коммитов' >&2 || echo "все коммиты" >&2
+[ -n "$countcommit" ] && echo $countcommit' коммитов' >&2 || echo "все коммиты" >&2
+echo -n "Шаблон имени пользователя: " >&2
+echo $username >&2
+echo -n >&2
 
 gitdiff=$fileaction".temp"
 logfile=$fileaction"action.xml"
 
-prepare_git $countcommit
+prepare_git "$username" $countcommit
 generate
