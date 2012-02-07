@@ -59,6 +59,9 @@ username=""
 for arg
 do
 	case "$arg" in
+		-[0-9]*)			
+			countcommit=$arg
+		;;
 		-n)			
 			[[ $n -eq 0 ]] && username="%cn"$username
 			n=1
@@ -76,9 +79,6 @@ do
 			e=1
 			n=1
 			username="%cn &lt;%ce&gt;>"
-		;;
-		-[0-9])
-			countcommit=$arg
 		;;
 	esac
 done;

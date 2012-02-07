@@ -28,9 +28,13 @@ generatelog(){
 			eval $line;
 			#проверяем не пустали переменная date, если нет производим вывод
             [ "$file" == "." ] && date=""
-			if [ -n "$date" ]; then			
+			if [ -n "$date" ]; then
+				author=`echo $author | sed -e 's/&lt;/</g' -e 's/&gt;/>/g'`
 				str="${date%000}|$author|$action|$filename";
-				[ "type" == "-l" ] && str="${date%000}|$author|$filename|$action|${#filename}" 
+				if [ "$type" == "-l" ]; then
+					author=`echo $author | sed -e 's/<//g' -e 's/>//g'`
+					str="${date%000}|$author|$filename|$action|${#filename}" 
+				if
 				echo $str >> $result
 			fi
 			#отображение процесса генерации.

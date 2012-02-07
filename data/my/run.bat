@@ -26,6 +26,7 @@ pause
 :actlogs
 	if not exist data\actlogs.log goto code_swarm
 	call sh sort_log ./data/actlogs.log > data\logstalgia.log
+	goto gource
     rem del data\actions.log
 ::)
 
@@ -55,8 +56,8 @@ popd
 if not exist data\gource.log goto logstalgia
 
 pushd "tools\gource"
-call gource.exe --bloom-intensity 0.35 -b 333333 -1280x720 --hide filenames,dirnames,mouse,progress --user-scale 2 --output-framerate 25 --user-image-dir "%rundir%\logos"  --stop-position 1 --highlight-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --key --multi-sampling --auto-skip-seconds 1 --time-scale 1 --follow-user "Pavel Roskin <proski@gnu.org>" -i 0 --user-image-dir "%rundir%\..\..\image_cache"
-:: --default-user-image "default" --elasticity 1
+call gource.exe --bloom-intensity 0.35 -b 111111 -1280x720 --hide filenames,dirnames,mouse,progress --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --key --multi-sampling --auto-skip-seconds 1 --time-scale 2 --follow-user "¿Ú∏Ï «Û·ÍÓ‚" -i 0 --camera-mode track --default-user-image "%rundir%\logos\user.png"
+::--user-image-dir "%rundir%\logos" --default-user-image "default" --elasticity 1
 popd
 
 pushd "tools\nt"
@@ -75,9 +76,11 @@ del "%results%\resultgource.fps"
 
 if not exist data\logstalgia.log goto :EOF
 
-pushd "tools\logstalgia"
-call logstalgia.exe --no-bounce --hide-paddle -b 111111 -1280x720 --glow-duration 1 --glow-multiplier 2 --glow-intensity 1 -g post,(.*\.post$),20,EEB211 -g share,(.*\.share$),20,3369E8 -g plus,(.*\.plus$),20,009939 -g comment,(.*\.comment$),20,D50F25 -g reshare,(.*\.reshare$),20,df73ff "%rundir%\data\logstalgia.log" --output-framerate 25 --output-ppm-stream "%results%\resultlogstalgia.ppm"
-popd
+::pushd "tools\logstalgia"
+call sh logstalgia "%rundir%/data/logstalgia.log" "%results%/resultlogstalgia.ppm"
+::call logstalgia.exe --no-bounce --hide-paddle -b 111111 -1280x720 --glow-duration 1 --glow-multiplier 2 --glow-intensity 1 -g setting,\.(in^|setting^|ini^|config^|conf)\b,20,3369E8 -g images,\.(ico^|xpm^|resx^|gif^|png^|svg^|jpg^|bmp)\b,20,009939 -g docs,\.(po^|txt^|log^|uml^|erwin^|hlp)\b,20,D50F25 -g source,\.(tcl^|php^|htm^|html^|xml^|sql^|sln^|dproj^|dpr^|pas^|dfm^|js^|cs^|css^|py^|rb^|erb^|hs^|c^|cpp^|h^|m^|d^|pl^|sh^|java^|lhs^|hi)\b,20,EEB211 "%rundir%\data\logstalgia.log" --output-framerate 25 --output-ppm-stream "%results%\resultlogstalgia.ppm"
+::-g post,(.*\.post$),20,EEB211 -g share,(.*\.share$),20,3369E8 -g plus,(.*\.plus$),20,009939 -g comment,(.*\.comment$),20,D50F25 -g reshare,(.*\.reshare$),20,df73ff
+::popd
 
 pushd "tools\nt"
 call ffmpeg -y -b 9000K -f image2pipe -vcodec ppm -i "%results%\resultlogstalgia.ppm" -fpre "..\ll.ffpreset" -i "%results%\resultlogstalgia.ppm" -vcodec libx264 "%results%\resultlogstalgia.avi"
@@ -90,5 +93,5 @@ call mencoder "%results%\resultlogstalgia.fps" -ovc x264 -x264encopts pass=1:bit
 popd
 
 del "%results%\resultlogstalgia.fps"
-
+pause
 echo on
