@@ -43,7 +43,7 @@ options:
 
     -WIDTHxHEIGHT, --viewport WIDTHxHEIGHT
             Set the viewport size. If -f is also supplied, will attempt to set
-            the video mode to this also.
+            the video mode to this also. Add ! to make the window non-resizable.
 
     -f, --fullscreen
             Fullscreen.
@@ -89,28 +89,28 @@ options:
             Elasticity of nodes.
 
     -b, --background-colour FFFFFF
-            Background colour in hex. 
+            Background colour in hex.
 
     --background-image IMAGE
-        Set a background image.
+            Set a background image.
 
     --logo IMAGE
-        Logo to display in the foreground.
+            Logo to display in the foreground.
 
     --logo-offset XxY
-        Offset position of the logo.
+            Offset position of the logo.
 
     --title TITLE
-        Set a title.
+            Set a title.
 
     --font-size SIZE
-        Font size.
+            Font size used by the date and title.
 
     --font-colour FFFFFF
-        Font colour in hex.
+            Font colour used by the date and title in hex.
 
     --key
-        Show file extension key.
+            Show file extension key.
 
     --date-format FORMAT
             Specify display date string (strftime format).
@@ -129,17 +129,23 @@ options:
     --follow-user USER
             Have the camera automatically follow a particular user.
 
+    --highlight-dirs
+            Highlight the names of all directories.
+
     --highlight-user USER
             Highlight the names of a particular user.
 
     --highlight-users
             Highlight the names of all users.
 
-    --highlight-dirs
-            Highlight the names of all directories.
-
     --highlight-colour FFFFFF
-            Highlighted text colour in hex.
+            Font colour for highlighted users in hex.
+    
+    --selection-colour FFFFFF
+            Font colour for selected users and files.
+
+    --dir-colour FFFFFF
+            Font colour for directories.
 
     --file-filter REGEX
             Filter out any files matching a specified regular expression.
@@ -172,7 +178,7 @@ options:
     --no-vsync
             Disable vsync.
 
-     --bloom-multiplier FLOAT
+    --bloom-multiplier FLOAT
             Adjust the amount of bloom.
 
     --bloom-intensity FLOAT
@@ -192,7 +198,7 @@ options:
             Max speed users can travel per second.
 
     --user-friction SECONDS
-            Time users come to a complete hault.
+            Time users take to come to a halt.
 
     --user-scale SCALE
             Change scale of users.
@@ -247,12 +253,12 @@ options:
             file (see log commands or the custom log format), a Gource conf
             file or '-' to read STDIN.
 
-            If path is ommited, gource will attempt to read a log from the
+            If path is omitted, gource will attempt to read a log from the
             current directory.
 
 Git, Bazaar, Mercurial and SVN Examples:
 
-View the log of the respository in the current path:
+View the log of the repository in the current path:
 
     gource
 
@@ -314,7 +320,7 @@ The time shown in the top left of the screen is set initially from the first
 log entry read and is incremented according to the simulation speed 
 (--seconds-per-day).
 
-Pressing SPACE at any time will pause/unpause the simulation. While paused you
+Pressing SPACE at any time will pause/resume the simulation. While paused you
 may use the mouse to inspect the detail of individual files and users.
 
 TAB cycles through selecting the current visible users.
@@ -336,6 +342,9 @@ Interactive keyboard commands:
     (+-)  Adjust simulation speed.
     (<>)  Adjust time scale.
     (TAB) Cycle through visible users
+    
+    (Alt+Enter) Toggle Fullscreen
+    
     (ESC) Quit
 
 4. Copyright

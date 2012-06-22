@@ -15,23 +15,24 @@ set mencoder=%rundir%\tools\nt\mencoder
 set results=%curRes%\results
 
 ::if not "%2" == "" (
-	::call sh gen_log ./data/actions.xml
+goto code_swarm
+	call sh gen_log ./data/actions.xml
 	::call sh gen_log ./data/actions.xml -o=./data/actlogs.log -l
-pause
+pause	
 	del data\gource.log
 	del data\logstalgia.log
 	
 	if not exist data\actions.log goto actlogs
 	call sh sort_log ./data/actions.log > data\gource.log
 :actlogs
+	goto code_swarm
 	if not exist data\actlogs.log goto code_swarm
 	call sh sort_log ./data/actlogs.log > data\logstalgia.log
-	goto gource
     rem del data\actions.log
 ::)
 
 :code_swarm
-
+::goto gource
 if not exist data\actions.xml goto gource
 
 pushd "%png%"
@@ -50,28 +51,34 @@ pushd "%curRes%\png"
 del *.png
 popd
 
-
 :gource
 
 if not exist data\gource.log goto logstalgia
 
 pushd "tools\gource"
-call gource.exe --bloom-intensity 0.35 -b 111111 -1280x720 --hide filenames,dirnames,mouse,progress --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-users --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log" --key --multi-sampling --auto-skip-seconds 1 --time-scale 2 --follow-user "¿Ú∏Ï «Û·ÍÓ‚" -i 0 --camera-mode track --default-user-image "%rundir%\logos\user.png"
+call gource.exe --bloom-intensity 0.35 -b 333333 -1280x720 --hide filenames,dirnames,progress --user-scale 2 --output-framerate 25 --stop-position 1 --highlight-users --highlight-dirs --seconds-per-day 1 --output-ppm-stream "%results%\resultgource.ppm" "%rundir%\data\gource.log"  --multi-sampling --auto-skip-seconds 1 --time-scale 1 -i 0 --camera-mode track --key --user-image-dir "D:\#Install\Icons\flags\32" -e 0.000000001 --bloom-multiplier 1.3 --logo "%rundir%\logos\fordem.png" 
+:: tree
+:: --logo-offset 10x834
+:: --follow-user "Russia"
+:: --key
+:: --hide filenames,dirnames
+::--default-user-image "%rundir%\logos\user.png"
 ::--user-image-dir "%rundir%\logos" --default-user-image "default" --elasticity 1
 popd
-
+::goto EOF
 pushd "tools\nt"
 call ffmpeg -y -b 9000K -f image2pipe -vcodec ppm -i "%results%\resultgource.ppm" -fpre "..\ll.ffpreset" -i "%results%\resultgource.ppm" -vcodec libx264 "%results%\resultgource.avi"
 
 del "%results%\resultgource.ppm"
 
-call mencoder "%results%\resultgource.avi" -ovc x264 -x264encopts pass=1:bitrate=10000 -ofps 19 -speed 2 -o "%results%\resultgource.fps"
+call mencoder "%results%\resultgource.avi" -ovc x264 -x264encopts pass=1:bitrate=10000 -ofps 25 -speed 1 -o "%results%\resultgource.fps"
 
 call mencoder "%results%\resultgource.fps" -ovc x264 -x264encopts pass=1:bitrate=10000 -oac copy -audiofile "%rundir%\data\audio.mp3" -o "%results%\resultgource.avi"
 popd
 
 del "%results%\resultgource.fps"
 
+goto EOF
 :logstalgia
 
 if not exist data\logstalgia.log goto :EOF
