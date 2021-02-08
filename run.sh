@@ -1,62 +1,159 @@
-# run.sh : code_swarm launching script
-# need the config file as first parameter
+#!/bin/bash
 
-params=$@
-default_config="data/sample.config"
-code_swarm_jar="dist/code_swarm.jar"
+scriptPath=$(realpath "$0")
+scriptPath=$(dirname "$scriptPath")
+tools="$scriptPath/tools"
 
-# command line parameters basic check
-if [ $# = 0 ]; then
-    # asking user for a config file
-    echo "code_swarm project !"
-    echo -n "Specify a config file, or ENTER for default one [$default_config] : "
-    read config
-    if [ ${#config} = 0 ]; then
-        params=$default_config
-    else
-        params=$config
-    fi
-else
-    if [ $1 == "-h" ] || [ $1 == "--help" ]; then
-        # if help needed, print it and exit
-        echo "usage: run.sh <configfile>"
-        echo ""
-        echo "   data/sample.config  is the default config file"
-        echo ""
-        exit
-    else
-        echo "code_swarm project !"
-    fi
-fi
+usage="$0 -o resultFolder [-g gitWorkDir]"
 
-# checking for code_swarm java binaries
-if [ ! -f $code_swarm_jar ]; then
-    echo "no code_swarm binaries !"
-    echo "needing to build it with 'ant' and 'javac' (java-sdk)"
-    echo ""
-    echo "auto-trying the ant command..."
-    if ant; then
-        echo ""
-    else
-        echo ""
-        echo "ERROR, please verify 'ant' and 'java-sdk' installation"
-        echo -n "press a key to exit"
-        read key
-        echo "bye"
-        exit
-    fi
-fi
+ppmToVideo() {
+  "$tools/ffmpeg/bin/ffmpeg.exe" -y -r 60 \
+    -f image2pipe \
+    -vcodec ppm \
+    -i "$1" \
+    -vcodec libx264 \
+    -preset ultrafast \
+    -pix_fmt yuv420p \
+    -crf 1 \
+    -threads 0 \
+    -bf 0 \
+    "$2" || exit 1
+}
 
-# running
-#if java -Xmx1000m -classpath dist/code_swarm.jar:lib/core.jar:lib/xml.jar:lib/vecmath.jar:. code_swarm $params; then
-#if java -Xmx1000m -classpath dist/code_swarm.jar:lib/gluegen-rt.jar:lib/jogl.jar:lib/jogl-natives-macosx-universal.jar:lib/core.jar:lib/opengl.jar:lib/xml.jar:lib/vecmath.jar:. code_swarm $params; then
-if java -Xmx1000m -classpath dist/code_swarm.jar:lib/gluegen-rt.jar:lib/jogl.jar:lib/jogl-natives-macosx-universal.jar:lib/core.jar:lib/opengl.jar:lib/xml.jar:lib/vecmath.jar:. -Djava.library.path=lib/ code_swarm $params; then
-# always on error due to no "exit buton" on rendering window
-    echo "bye"
-#    echo -n "error, press a key to exit"
-#    read key
-else
-    echo "bye"
-fi
+pngToVideo() {
+  "$tools/ffmpeg/bin/ffmpeg.exe" -r 60 \
+    -f image2 \
+    -s 1280x720 \
+    -i "$1" \
+    -vcodec libx264 \
+    -crf 25 \
+    -pix_fmt yuv420p \
+    "$2" || exit 1
+}
+
+speedUpVideo() {
+  "$tools/ffmpeg/bin/ffmpeg.exe" -i "$1" \
+    -filter:v "setpts=0.5*PTS" \
+    "$2" || exit 1
+}
+
+addAudio() {
+  "$tools/ffmpeg/bin/ffmpeg.exe" -i "$1" \
+    -i "$2" \
+    -map 0:v \
+    -map 1:a \
+    -c:v copy \
+    -shortest \
+    "$3" || exit 1
+}
+
+main() {
+  resDir="$1"
+  pngDir="$resDir/png"
+  resPpm="$resDir/temp.ppm"
+  pngFilePattern="$pngDir/f-############.png"
+  videoTmp="$resDir/temp.mp4"
+  videoLogstalgia="$resDir/logstalgia.mp4"
+  videoGrouce="$resDir/gource.mp4"
+  videoCodeSwarm="$resDir/codeswarm.mp4"
+
+  echo "create png dir > $pngDir"
+  mkdir "$pngDir"
+
+  logstalgia="$scriptPath/logstalgia.sh"
+  gource="$scriptPath/gource.sh"
+  codeswarm="$scriptPath/codeswarm.sh"
+  gen_log="$scriptPath/gen_log.py"
+
+  tmpDir=$(mktemp -d)
+  prefix="$tmpDir/actions"
+  actions_c="$prefix""_codeswarm.xml"
+  actions_g="$prefix""_gource.log"
+  actions_l="$prefix""_logstalgia.log"
+
+  pushd "$2" || exit
+  py "$gen_log" -glce -p "$prefix"
+  popd || exit
+
+  doubleSpeed="$3"
+
+# Logstalgia
+  sh "$logstalgia" "$actions_l" "$resPpm" || exit 1
+
+  ppmToVideo "$resPpm" "$videoTmp"
+
+  rm -f "$resPpm"
+
+  [ -n "$doubleSpeed" ] && {
+    speedUpVideo "$videoTmp" "$videoLogstalgia"
+    mv -f "$videoLogstalgia" "$videoTmp"
+  }
+
+  addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoLogstalgia"
+
+  rm -f "$videoTmp"
 
 
+# Gource
+  sh "$gource" "$actions_g" "$resPpm" "$scriptPath/logos/neto-logo.png" || exit 1
+
+  ppmToVideo "$resPpm" "$videoTmp"
+
+  rm -f "$resPpm"
+
+  [ -n "$doubleSpeed" ] && {
+    speedUpVideo "$videoTmp" "$videoGrouce"
+    mv -f "$videoGrouce" "$videoTmp"
+  }
+
+  addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoGrouce"
+
+  rm -f "$videoTmp"
+
+# CodeSwarm
+  sh "$codeswarm" "$actions_c" "$pngFilePattern" || exit 1
+
+  pngToVideo "$pngDir/f-%012d.png" "$videoTmp"
+
+  rm -rf "$pngDir/*.png"
+
+  addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoCodeSwarm"
+
+  rm -f "$videoTmp"
+
+  rm -fr "$tmpDir"
+}
+
+printUsage() {
+  echo -e "correct usage: $usage"
+  exit
+}
+
+while [[ $# -gt 0 ]]
+do
+	case "$1" in
+		-o)
+			output="$2"
+			shift 2
+		;;
+		-g)
+			gitWorkDir="$2"
+			shift 2
+		;;
+    -d)
+      doubleSpeed=1
+			shift 1
+    ;;
+    *)
+      shift
+    ;;
+	esac
+done;
+
+[ ! -d "$output" ] && printUsage
+[ ! -d "$gitWorkDir" ] && {
+  echo "argument '-g gitWorkDir' is not passed, will be used $(pwd)"
+  gitWorkDir=$(pwd)
+}
+
+main "$output" "$gitWorkDir" "$doubleSpeed"

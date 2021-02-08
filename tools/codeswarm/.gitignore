@@ -1,0 +1,14 @@
+.classpath
+.DS_Store
+.project
+.svn
+frames
+*.pyc
+*.proof
+image_cache
+defaults/user.config
+personal/
+data/my/png
+data/my/results
+*.log
+data/my/data/*.xml

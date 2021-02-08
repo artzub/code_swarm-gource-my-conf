@@ -1,0 +1,126 @@
+1.0.9:
+ * Fixed compilation issues on FreeBSD (ehaupt) and OpenBSD (gonzalo-).
+ * Fixed config change not being detected in some cases.
+
+1.0.8:
+ * Performance improvements.
+ * Changed unsuccessful response code direction to match ball.
+ * Added --screen option.
+ * Added --window-position XxY option.
+ * Added --frameless option.
+ * Added --title option (mclang).
+ * Added --detect-changes option to automatically reload config file.
+ * Added --display-fields FIELDS to set fields shown mousing over a request.
+ * Can now specify path separators, max path depth and min abbreviation depth.
+ * Reload config (F5).
+ * Save config (Ctrl+S) with updated display settings.
+ * Fixed queued log entries not being deleted when seeking using the timeline.
+ * Made --hide-url-prefix apply to https URLs (rudisimo).
+ * Counter no longer overflows at 100000000.
+ * Now requires SDL 2 to build (deprecated SDL 1.2 support removed).
+
+1.0.7:
+ * Added window frame toggle (F11).
+ * Fixed crash loading large log files on Windows.
+ * Fixed crash when taking a screenshot with an odd resolution.
+ * Handle exception when user defined regular expression is invalid.
+ * Fixed --hide-url-prefix not working (jettero).
+
+1.0.6:
+ * Display invalid requests as having the path '???'.
+ * Updated the boost autoconf macro.
+
+1.0.5:
+ * Performance improvements.
+ * Multi-monitor support using SDL 2.0.
+ * SDL 1.2 support is deprecated.
+ * Can now specify the attribute to match the group regex (-g) against.
+ * When using --sync, now catches back up after resuming from pause.
+ * Added --pitch-speed option (control how fast balls travel).
+ * Made default group matches case-insensitive (Sebastian Krzyszkowiak).
+ * Display tokens in multi-paddle modes (Sebastian Krzyszkowiak).
+ * Added window resizing and a full-screen toggle (alt-enter).
+ * Take screenshots (F12).
+ * Summarizer component content is now sorted.
+ * IPv6 addresses now anonymized by default as well (last 64 bits).
+ * New dependencies on libpng, GLEW.
+ * Now requires GLM and Boost header-only libraries to build.
+
+1.0.4:
+ * Changed type of log entry timestamp to time_t.
+ * Stopped directly linking PNG/JPG libraries.
+
+1.0.3:
+ * Added automatic skipping of empty periods (--disable-auto-skip to turn off).
+ * Updated docs to reflect support for NCSA log formats, not just 'Apache'.
+ * Support log entry dates with a valid numeric month in place of MMM.
+
+1.0.2:
+ * Performance improvements.
+ * Stopped frame-rate being a bottle neck for the number of requests shown.
+ * Improved STDIN input reliability on windows.
+ * Handle log entry timezone offsets.
+ * Added --paddle-position option (to allow more space for URLs).
+ * Added --font-size option.
+
+1.0.1:
+ * Made STDIN non-blocking on Windows using PeekNamedPipe (thanks Rui Lopes).
+ * Added --hide-url-prefix option to remove protocol and hostname from requests.
+ * Removed arbitrary 1024 maximum length limit for log entries.
+ * Fixed custom log format not working when optional fields are omitted.
+
+1.0.0:
+ * Every 60 minutes fade static text out and back in over a period of a minute.
+
+0.9.9:
+ * Support for more common Apache access log formats.
+ * Added --paddle-mode (vhost,pid,single) which spawns separate paddles.
+ * Fixed PPM exporter producing blank images on some video cards.
+
+0.9.8:
+ * Added --background option to control the background colour.
+ * Filter hostnames from URLs before displaying them.
+ * Fixed command line option documentation.
+
+0.9.7:
+ * Added --sync option (start from the next entry received on STDIN).
+
+0.9.6:
+ * Defer to homepage for video recording instructions.
+
+0.9.5:
+ * Adjust time scale with <> keys.
+
+0.9.4:
+ * Fixed STDIN stopping working after the first lot of records.
+
+0.9.3:
+ * Added seekbar for log files (not available from STDIN).
+ * Added glow on impact with paddle (turn off using --disable-glow).
+ * PPM output for videos using --output-ppm-stream option.
+ * Custom log file format support.
+ * Changed font library to FTGL.
+ * --stop-position and --start-position options.
+ * Open a file selector if no log file supplied (on Windows).
+
+0.9.2:
+ * Fixed issue with resource.h.
+ * Makefile patch for OPTFLAGS from terjeros.
+ * Fixed apache.log hostname parsing issue.
+
+0.9.1:
+ * Added example.log.
+
+0.9.0c:
+ * Changed Makefile to use configure libs.
+
+0.9.0b:
+ * Incorporated manual page fixes from Francois Marier.
+ * Fixed bug in URL summarizer that caused it to leave out some URLs
+   when pressed for space.
+
+0.9.0a:
+ * Fixed manual description of -x flag.
+
+0.9.0:
+ * First release.

@@ -1,9 +1,0 @@
-#!/bin/sh
-./tools/logstalgia/logstalgia.exe --no-bounce --hide-paddle -b 111111 -1280x720 --glow-duration 1 \
-	--glow-multiplier 2 --glow-intensity 1 \
-	-g setting,'\.(in|setting|ini|config|conf)\b',20,3369E8 \
-	-g images,'\.(ico|xpm|resx|gif|png|svg|jpg|bmp)\b',20,009939 \
-	-g docs,'[Cc]hange[Ll]og|\.(po|txt|log|uml|erwin|hlp)\b',20,D50F25 \
-	-g source,'\.(tcl|php|htm|html|xml|sql|sln|dproj|dpr|pas|dfm|js|cs|css|py|rb|erb|hs|c|cpp|h|m|d|pl|sh|java|lhs|hi)\b',20,EEB211 "$1" --output-framerate 25 --output-ppm-stream "$2"
-#%rundir%
-#%results%
