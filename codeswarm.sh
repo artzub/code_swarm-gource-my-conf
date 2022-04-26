@@ -5,11 +5,15 @@ scriptPath=$(dirname "$scriptPath")
 #$(mktemp)
 config=$(mktemp)
 
+pngPath=$(cygpath -w "$2" | sed 's/\\/\\\\/g')
+
 log="${1#*.}"
 log="${log%/*}"
 log="$log.xml"
 
 mv "$1" "$scriptPath/tools/codeswarm/data/$log"
+
+echo "pngPath: $pngPath"
 
 cat > "$config" << EOF
 ColorAssign1="Source Code", "(.*tcl)|(.*php)|(.*htm)|(.*html)|(.*xml)|(.*sql)|(.*sln)|(.*dproj)|(.*dpr)|(.*pas)|(.*dfm)|(.*js)|(.*jsx)|(.*ts)|(.*tsx)|(.*cs)|(.*css)|(.*py)|(.*rb)|(.*erb)|(.*hs)|(.*c)|(.*cpp)|(.*h)|(.*m)|(.*d)|(.*pl)|(.*sh)|(.*java)|(.*lhs)|(.*hi)", 100,255,255, 120,200,200
@@ -20,7 +24,7 @@ ColorAssign4="Documents", "(.*po)|(.*txt)|(.*log)|(.*uml)|(.*erwin)|(.*hlp)|(.*m
 Width=1280
 Height=720
 InputFile=data/$log
-SnapshotLocation=$2
+SnapshotLocation=$pngPath
 #E:/results/png/f-############.png
 #cs-#############.png
 
@@ -32,8 +36,8 @@ FontSize=16
 BoldFontSize=16
 #MillisecondsPerFrame=2254085
 # Optional Method instead of MillisecondsPerFrame
-FramesPerDay=60
-MaxThreads=4
+FramesPerDay=24
+MaxThreads=8
 Background=0,0,0
 TakeSnapshots=true
 
@@ -45,6 +49,7 @@ DrawFilesJelly=false
 
 ShowLegend=true
 ShowHistory=true
+ShowUserName=true
 ShowDate=true
 ShowEdges=true
 ShowDebug=false
@@ -61,13 +66,12 @@ PersonSpeed=2.0
 FileMass=2.0
 PersonMass=10.0
 
-EdgeLife=250
-FileLife=250
-PersonLife=255
+EdgeLife=240
+FileLife=500
+PersonLife=260
 
-HighlightPct=5
+HighlightPct=1
 UseOpenGL=false
-ShowUserName=true
 IsInputSorted=false
 
 AvatarSize=32
@@ -79,6 +83,8 @@ AvatarSize=32
 #AvatarFetcher=FreebaseAvatarFetcher
 AvatarFetcher=GravatarFetcher
 EOF
+
+
 
 pushd "$scriptPath/tools/codeswarm/" || exit 1
 ./run.bat "$config" || exit 1

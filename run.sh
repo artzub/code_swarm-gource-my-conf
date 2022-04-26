@@ -4,7 +4,7 @@ scriptPath=$(realpath "$0")
 scriptPath=$(dirname "$scriptPath")
 tools="$scriptPath/tools"
 
-usage="$0 -o resultFolder [-g gitWorkDir]"
+usage="$0 -o resultFolder [-r gitWorkDir] -s -l -g -c"
 
 ppmToVideo() {
   "$tools/ffmpeg/bin/ffmpeg.exe" -y -r 60 \
@@ -77,51 +77,65 @@ main() {
 
   doubleSpeed="$3"
 
+  useLogstalgia="$4"
+  useGource="$5"
+  useCodeswarm="$6"
+
 # Logstalgia
-  sh "$logstalgia" "$actions_l" "$resPpm" || exit 1
+  [ -n "$useLogstalgia" ] && {
+    sh "$logstalgia" "$actions_l" "$resPpm" || exit 1
 
-  ppmToVideo "$resPpm" "$videoTmp"
+    ppmToVideo "$resPpm" "$videoTmp"
 
-  rm -f "$resPpm"
+    rm -f "$resPpm"
 
-  [ -n "$doubleSpeed" ] && {
-    speedUpVideo "$videoTmp" "$videoLogstalgia"
-    mv -f "$videoLogstalgia" "$videoTmp"
+    [ -n "$doubleSpeed" ] && {
+      speedUpVideo "$videoTmp" "$videoLogstalgia"
+      mv -f "$videoLogstalgia" "$videoTmp"
+    }
+
+    addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoLogstalgia"
+
+    rm -f "$videoTmp"
   }
-
-  addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoLogstalgia"
-
-  rm -f "$videoTmp"
-
 
 # Gource
-  sh "$gource" "$actions_g" "$resPpm" "$scriptPath/logos/neto-logo.png" || exit 1
+  [ -n "$useGource" ] && {
+    sh "$gource" "$actions_g" "$resPpm" "$scriptPath/logos/neto-logo.png" || exit 1
 
-  ppmToVideo "$resPpm" "$videoTmp"
+    ppmToVideo "$resPpm" "$videoTmp"
 
-  rm -f "$resPpm"
+    rm -f "$resPpm"
 
-  [ -n "$doubleSpeed" ] && {
-    speedUpVideo "$videoTmp" "$videoGrouce"
-    mv -f "$videoGrouce" "$videoTmp"
+    [ -n "$doubleSpeed" ] && {
+      speedUpVideo "$videoTmp" "$videoGrouce"
+      mv -f "$videoGrouce" "$videoTmp"
+    }
+
+    addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoGrouce"
+
+    rm -f "$videoTmp"
   }
 
-  addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoGrouce"
-
-  rm -f "$videoTmp"
-
 # CodeSwarm
-  sh "$codeswarm" "$actions_c" "$pngFilePattern" || exit 1
+  [ -n "$useCodeswarm" ] && {
+    sh "$codeswarm" "$actions_c" "$pngFilePattern" || exit 1
 
-  pngToVideo "$pngDir/f-%012d.png" "$videoTmp"
+    pngToVideo "$pngDir/f-%012d.png" "$videoTmp"
 
-  rm -rf "$pngDir/*.png"
+    rm -rf "$pngDir"
 
-  addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoCodeSwarm"
+    [ -n "$doubleSpeed" ] && {
+      speedUpVideo "$videoTmp" "$videoCodeSwarm"
+      mv -f "$videoCodeSwarm" "$videoTmp"
+    }
 
-  rm -f "$videoTmp"
+    addAudio "$videoTmp" "$scriptPath/data/deepSpace.mp3" "$videoCodeSwarm"
 
-  rm -fr "$tmpDir"
+    rm -f "$videoTmp"
+
+    rm -fr "$tmpDir"
+  }
 }
 
 printUsage() {
@@ -131,23 +145,35 @@ printUsage() {
 
 while [[ $# -gt 0 ]]
 do
-	case "$1" in
-		-o)
-			output="$2"
-			shift 2
-		;;
-		-g)
-			gitWorkDir="$2"
-			shift 2
-		;;
-    -d)
+  case "$1" in
+    -o)
+      output="$2"
+      shift 2
+    ;;
+    -r)
+      gitWorkDir="$2"
+      shift 2
+    ;;
+    -g)
+      useGource=1
+      shift 1
+    ;;
+    -l)
+      useLogstalgia=1
+      shift 1
+    ;;
+    -c)
+      useCodeswarm=1
+      shift 1
+    ;;
+    -s)
       doubleSpeed=1
-			shift 1
+      shift 1
     ;;
     *)
       shift
     ;;
-	esac
+  esac
 done;
 
 [ ! -d "$output" ] && printUsage
@@ -156,4 +182,4 @@ done;
   gitWorkDir=$(pwd)
 }
 
-main "$output" "$gitWorkDir" "$doubleSpeed"
+main "$output" "$gitWorkDir" "$doubleSpeed" "$useLogstalgia" "$useGource" "$useCodeswarm"

@@ -5,7 +5,7 @@ scriptPath=$(dirname "$scriptPath")
 "$scriptPath/tools/gource/gource.exe" --bloom-intensity 0.35 \
   -b 111111 \
   -1280x720 \
-  --hide filenames,mouse,progress \
+  --hide filenames,mouse,progress,dirnames \
   --user-scale 3 \
   --stop-position 1 \
   --highlight-users \
